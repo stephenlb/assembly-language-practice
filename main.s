@@ -7,14 +7,12 @@
 
 // The .data section is for initialized data, like our string.
 .data
-    .align 3 // align to 8 byte boundary
-    // name of var  type   value
+    .align 3
     hello_string: .string "Hello, World! " // null-terminated string
     hello_string_len = . - hello_string
 
-.bss
     .align 3
-    counter: .quad 0
+    counter: .quad 0     // 8-byte integer initialized to 0
     numbuf:  .space 32   // enough for 20 digits + slack
 
 // .text will contain the actual code (instructions) of the program.
@@ -48,24 +46,24 @@ loophere:
     svc    #0x80               // Invoke the system call
 
     // Load, increment, and store the counter
-    adrp   x4, counter@PAGE
-    add    x4, x4, counter@PAGEOFF
-    ldr    x5, [x4]         // x5 = counter
-    add    x5, x5, #1       // ++counter
-    str    x5, [x4]
+    adrp   X4, counter@PAGE
+    add    X4, X4, counter@PAGEOFF
+    ldr    X5, [X4]         // x5 = counter
+    add    X5, X5, #1       // ++counter
+    str    X5, [X4]
 
     // Convert counter (x5) to decimal string in numbuf
-    adrp   x1, numbuf@PAGE
-    add    x1, x1, numbuf@PAGEOFF    // x1 = buffer base
-    mov    x2, #32                   // buffer size
-    mov    x0, x5                    // value to convert
+    adrp   X1, numbuf@PAGE
+    add    X1, X1, numbuf@PAGEOFF    // x1 = buffer base
+    mov    X2, #32                   // buffer size
+    mov    X0, X5                    // value to convert
     bl     _u64_to_str               // returns: x0 = ptr, x1 = len
 
     // Write the number string
-    mov    x16, #4                   // write
-    mov    x2,  x1                   // len
-    mov    x1,  x0                   // ptr
-    mov    x0,  #1                   // stdout
+    mov    X16, #4                   // write
+    mov    X2,  X1                   // len
+    mov    X1,  X0                   // ptr
+    mov    X0,  #1                   // stdout
     svc    #0x80
 
     // b is branch, loop forever
