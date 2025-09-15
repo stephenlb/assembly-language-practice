@@ -1,18 +1,12 @@
 #!/bin/bash
-echo "Building $1"
 
-# Check for input
-if [ -z "$1" ]; then
-  echo "Usage: $0 <source-file.s>"
-  exit 1
-fi
-
-# Remove extension if present
-filename=$(basename -- "$1")
-name="${filename%.*}"
-echo "Filename: $filename"
-echo "Name: $name"
-
-## Build
-as $filename -o $name.o
-ld -o $name $name.o -lSystem -syslibroot `xcrun -sdk macosx --show-sdk-path` -e _start -arch arm64
+as main.s -o main.o
+as sleep.s -o sleep.o
+as u64_to_str.s -o u64_to_str.o
+ld -o main -lSystem \
+    -syslibroot `xcrun -sdk macosx --show-sdk-path` \
+    -e _start \
+    -arch arm64 \
+    u64_to_str.o \
+    sleep.o \
+    main.o
